@@ -1,0 +1,20 @@
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
+
+PROJECT( FLTK_VTK )
+FIND_PACKAGE ( VTK )
+IF ( VTK_FOUND )
+	INCLUDE( ${USE_VTK_FILE} )
+ENDIF( VTK_FOUND )
+
+FIND_PACKAGE ( FLTK )
+IF ( FLTK_FOUND)
+	INCLUDE_DIRECTORIES( ${FLTK_INCLUDE_DIR} )
+ENDIF( FLTK_FOUND)
+
+ADD_EXECUTABLE( vtkfltkwindow vtkfltkwindow.cxx vtkFlRenderWindowInteractor.cxx)
+
+IF ( FLTK_FOUND )
+	FLTK_WRAP_UI( vtkfltkwindow vtkfltkwindowGUI.fl )
+ENDIF ( FLTK_FOUND )
+
+TARGET_LINK_LIBRARIES( vtkfltkwindow vtkRendering ${FLTK_LIBRARIES} )

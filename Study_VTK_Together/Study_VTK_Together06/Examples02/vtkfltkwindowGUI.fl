@@ -1,0 +1,121 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0300 
+header_name {.h} 
+code_name {.cxx}
+class vtkfltkwindowGUI {open
+} {
+  Function {vtkfltkwindowGUI()} {open
+  } {
+    Fl_Window m_vtkfltkwindow {
+      label VTKFLTKWindow open
+      xywh {20 17 590 515} type Double box PLASTIC_DOWN_BOX
+      code0 {\#include "vtkPolyDataMapper.h"
+\#include "vtkConeSource.h"
+\#include "vtkRenderWindow.h" 
+\#include "vtkCamera.h"
+\#include "vtkActor.h"  
+\#include "vtkRenderer.h" 
+\#include "vtkInteractorStyleTrackballCamera.h"} visible
+    } {
+      Fl_Box renderWindowInteractor {
+        label label
+        xywh {8 27 575 433} box PLASTIC_DOWN_FRAME
+        code0 {\#include "vtkFlRenderWindowInteractor.h"}
+        class vtkFlRenderWindowInteractor
+      }
+      Fl_Button m_quitbutton {
+        label {Quit Application}
+        callback {Quit();} selected
+        xywh {220 475 125 30} box PLASTIC_UP_BOX
+      }
+      Fl_Menu_Bar {} {open
+        xywh {0 0 590 25} box PLASTIC_UP_BOX align 11
+      } {
+        Submenu {} {
+          label {&File} open
+          xywh {0 0 62 20}
+        } {
+          MenuItem {} {
+            label {&Open}
+            xywh {0 0 30 20}
+          }
+          MenuItem {} {
+            label {&Save}
+            xywh {0 0 30 20}
+          }
+          MenuItem {} {
+            label Quit
+            callback {Quit();}
+            xywh {0 0 30 20}
+          }
+        }
+        Submenu {} {
+          label {&Edit} open
+          xywh {0 0 62 20}
+        } {
+          MenuItem {} {
+            label {&Copy}
+            xywh {0 0 30 20}
+          }
+          MenuItem {} {
+            label Paste
+            xywh {0 0 30 20}
+          }
+        }
+      }
+    }
+  }
+  Function {~vtkfltkwindowGUI()} {} {}
+  Function {GenerateModel()} {open return_type void
+  } {}
+  Function {Quit()} {open return_type {virtual void}
+  } {
+    code {m_vtkfltkwindow->hide();} {}
+  }
+  Function {Show()} {open return_type {virtual void}
+  } {
+    code {vtkRenderWindow *renWin = vtkRenderWindow::New();
+  renderWindowInteractor->SetRenderWindow( renWin );
+
+  vtkRenderer *ren1= vtkRenderer::New();
+  renWin->AddRenderer( ren1 );
+
+  m_vtkfltkwindow->end();
+
+  renderWindowInteractor->Initialize();
+
+  vtkInteractorStyleTrackballCamera *style = 
+    vtkInteractorStyleTrackballCamera::New();
+
+  renderWindowInteractor->SetInteractorStyle( style );
+
+  vtkConeSource *cone = vtkConeSource::New();
+  cone->SetHeight( 3.0 );
+  cone->SetRadius( 1.0 );
+  cone->SetResolution( 10 );
+  
+  vtkPolyDataMapper *coneMapper = vtkPolyDataMapper::New();
+  coneMapper->SetInputConnection( cone->GetOutputPort() );
+
+  vtkActor *coneActor = vtkActor::New();
+  coneActor->SetMapper( coneMapper );
+
+  ren1->AddActor( coneActor );
+  ren1->SetBackground( 0.1, 0.2, 0.4 );
+
+ // Fl::wait(0.01);
+ // Fl::check();
+ 
+ // style->Delete();
+ // cone->Delete();
+ // coneMapper->Delete();
+ // coneActor->Delete();
+ // ren1->Delete();
+ // renWin->Delete();
+
+ // renderWindowInteractor->Delete();
+ // delete m_vtkfltkwindow;
+
+m_vtkfltkwindow->show();} {}
+  }
+} 

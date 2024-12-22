@@ -1,0 +1,4 @@
+Ö÷ÒªÄÚÈİ£º
+
+1. vtkLight
+2. vtkCamera

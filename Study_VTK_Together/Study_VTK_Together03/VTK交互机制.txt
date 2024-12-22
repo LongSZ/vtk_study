@@ -1,0 +1,14 @@
+VTK交互机制：
+
+    
+    类vtkRenderWindowInteractor被用来获取绘制窗口上发生的鼠标和键盘事件，然后把这些事件分发到另一个类——vtkInteractorStyle。因此，要增加新的交互方式到VTK里的话，应该先从vtkInteractorStyle派生出一个子类，如：vtkInteractorStyleTrackball, vtkInteractorStyleJoystickActor, vtkInteractorStyleJoystickCamera, vtkInteractorStyleUser等。vtkInteractorStyleUser允许用户自定义交互方式。
+
+    实际上，vtkRenderWindowInteractor的工作方式是这样的：这个类会截取发生在与它关联的vtkRenderWindow(通过vtkRenderWindowInteractor的SetRenderWindow()方法加入的那个绘制窗口)上的事件，然后，vtkRenderWindowInteractor类会根据具体的设备以及操作系统实例化一个对象，比如说，Unix下是vtkXRenderWindowInteractor，而Windows下则是vtkWin32RenderWindowInteractor。当vtkRenderWindowInteractor::Start()方法被调用时，事件的截取功能就会被激活。最后，这些所截取的事件会被送往vtkRenderWindowInteractor::InteractorStyle这个实例进行处理。InteractorStyle是vtkRenderWindowInteractor类里面的一个保护的数据成员，是vtkInteractorObserver类型的指针，而vtkInteractorObserver是被vtkRenderWindowInteractor调用的类，它的作用是监测所发生的事件，这样，由vtkRenderWindowInteractor所截取的消息就有了归宿。
+
+
+    VTK里定义好的主要的交互类型有：
+    vtkInteractorStyleJoystickActor/Camera; vtkInteractorTrackballActor/Camera; vtkInteractorStyleSwitch; vtkInteractorStyleTrackball; vtkInteractorStyleImage; vtkInteractorStyleFlight; vtkInteractorStyleUnicam; vtkInteractorStyleUser等。其中vtkInteractorStyleImage是专为显示图像(vtkImageActor)时设计的交互方式，用这种交互方式可以通过鼠标运动，调节图像的窗宽/窗位，放大/缩小等操作。
+
+
+    在VTK里，什么类能响应什么事件，一般都是预先定义好的，当然用户也可以自定义对这些事件的响应。所有的Filter(即vtkProcessObject的子类)都可以调用: StartEvent; EndEvent; ProgressEvent。可以用截取这些事件，在Filter处理数据的过程中给用户一些反馈的信息，如该Filter的处理时间等。当vtkRenderWindow绘制时，可以调用事件：AbortCheckEvent。
+

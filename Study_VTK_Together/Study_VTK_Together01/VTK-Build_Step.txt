@@ -1,0 +1,22 @@
+《Study VTK Together 一起学习VTK 第1讲-VTK的安装与VTK帮助文档的生成》
+
+    为什么选择视频的方式来说明VTK的安装过程呢？因为视频直观，而且有语音说明提示等。做到视觉与听觉并用。如果仅仅是图文说明信息的话，很枯燥，让人没耐心看下去。
+
+    希望这段视频对你有用，也总算没有白费我一个多小时的时间:-)
+
+
+
+1.准备材料
+2.安装CMake, VS2008,VS2010...,安装VTK二进制文件: vtk-5.6.0-win32.exe
+3.再建一个空文件夹，名字随便起。
+4.CMake: source code and build the binaries填上相应的路径。
+5.按configure进行配置
+6.BUILD_EXAMPLES and BUILD_TESTING不要选，可节省工程编译时间。
+7.打开第3步新建的文件夹下的vtk.sln文件，进入vs2008IDE环境。
+8.F7,编译所有工程。
+9.等....工程编译完毕。
+
+VTK帮助文档在线查阅：http://www.vtk.org/doc/nightly/html/index.html
+
+你在看视频的时候完全可以跳过这一段，我在安装的过程中当然就没办法跳过了。
+
