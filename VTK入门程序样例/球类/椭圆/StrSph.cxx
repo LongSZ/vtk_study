@@ -10,93 +10,74 @@
 #include "vtkActor2D.h"
 #include "vtkCamera.h"
 #include "vtkScalarBarActor.h"
-#include "SaveImage.h"
 #include "vtkCoordinate.h"
 #include "vtkPolyDataMapper2D.h" 
 
-void main( int argc, char *argv[] )
-{
-  vtkRenderer *renderer = vtkRenderer::New();
-  vtkRenderWindow *renWin = vtkRenderWindow::New();
-    renWin->AddRenderer(renderer);
-  vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-    iren->SetRenderWindow(renWin);
+void main(int argc, char* argv[]) {
+    vtkNew<vtkSphereSource> sphere;
+    sphere->SetThetaResolution(12);
+    sphere->SetPhiResolution(12);
 
-  vtkSphereSource *sphere = vtkSphereSource::New();
-    sphere->SetThetaResolution(12); 
-	sphere->SetPhiResolution(12);
+    vtkNew<vtkTransform> aTransform;
+    aTransform->Scale(1, 1.5, 2);
 
-  vtkTransform *aTransform = vtkTransform::New();
-    aTransform->Scale(1,1.5,2);
+    vtkNew<vtkTransformFilter> transFilter;
+    transFilter->SetInputConnection(sphere->GetOutputPort());
+    transFilter->SetTransform(aTransform);
 
-  vtkTransformFilter *transFilter = vtkTransformFilter::New();
-    transFilter->SetInput(sphere->GetOutput());
-    transFilter->SetTransform(aTransform);  
+    vtkNew<vtkElevationFilter> colorIt;
+    colorIt->SetInputConnection(transFilter->GetOutputPort());
+    colorIt->SetLowPoint(0, 0, -1);
+    colorIt->SetHighPoint(0, 0, 1);
 
-  vtkElevationFilter *colorIt = vtkElevationFilter::New();
-    colorIt->SetInput(transFilter->GetOutput());
-    colorIt->SetLowPoint(0,0,-1);
-    colorIt->SetHighPoint(0,0,1);
+    vtkNew<vtkLookupTable> lut;
+    lut->SetHueRange(0, 0);
+    lut->SetSaturationRange(0, 0);
+    lut->SetValueRange(.1, 1);
 
-  vtkLookupTable *lut = vtkLookupTable::New();
-    lut->SetHueRange(0,0);
-    lut->SetSaturationRange(0,0);
-    lut->SetValueRange(.1,1);
-
-vtkCoordinate *normCoords=vtkCoordinate::New();
+    vtkNew<vtkCoordinate> normCoords;
     normCoords->SetCoordinateSystemToWorld();
-//    normCoords->SetCoordinateSystemToDisplay (); 
-//    normCoords->SetCoordinateSystemToNormalizedDisplay (); 
-//    normCoords->SetCoordinateSystemToViewport (); 
-//    normCoords->SetCoordinateSystemToNormalizedViewport (); 
-//    normCoords->SetCoordinateSystemToView ();
+    //normCoords->SetCoordinateSystemToDisplay (); 
+    //normCoords->SetCoordinateSystemToNormalizedDisplay (); 
+    //normCoords->SetCoordinateSystemToViewport (); 
+    //normCoords->SetCoordinateSystemToNormalizedViewport (); 
+    //normCoords->SetCoordinateSystemToView ();
 
-  vtkPolyDataMapper2D *mapper = vtkPolyDataMapper2D::New();
+    vtkNew<vtkPolyDataMapper2D> mapper;
     mapper->SetLookupTable(lut);
-    mapper->SetInput((vtkPolyData *)colorIt->GetOutput());
-	mapper->SetTransformCoordinate(normCoords);
+    mapper->SetInputConnection(colorIt->GetOutputPort());
+    mapper->SetTransformCoordinate(normCoords);
 
-  vtkActor2D *actor = vtkActor2D::New();
+    vtkNew<vtkActor2D> actor;
     actor->SetMapper(mapper);
 
-//Create a scalar bar
-vtkScalarBarActor *scalarBar=vtkScalarBarActor::New();
-    scalarBar-> SetLookupTable(mapper-> GetLookupTable());
-    scalarBar-> SetTitle ("Color Table");
-    scalarBar-> GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
-    scalarBar-> GetPositionCoordinate()-> SetValue(0.1, 0.01);  
-//    scalarBar-> GetPositionCoordinate()->
-	scalarBar->SetNumberOfLabels(6);  
-    scalarBar-> SetOrientationToHorizontal();
-    scalarBar-> SetWidth (0.8);
-    scalarBar-> SetHeight (0.12);
+    //Create a scalar bar
+    vtkNew<vtkScalarBarActor> scalarBar;
+    scalarBar->SetLookupTable(mapper->GetLookupTable());
+    scalarBar->SetTitle("Color Table");
+    scalarBar->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+    scalarBar->GetPositionCoordinate()->SetValue(0.1, 0.01);
+    //scalarBar-> GetPositionCoordinate()
+    scalarBar->SetNumberOfLabels(6);
+    scalarBar->SetOrientationToHorizontal();
+    scalarBar->SetWidth(0.8);
+    scalarBar->SetHeight(0.12);
 
+    vtkNew<vtkRenderer> renderer;
+    renderer->AddActor(actor);
+    renderer->AddActor2D(scalarBar);
+    renderer->SetBackground(1, 1, 0);
+    renderer->GetActiveCamera()->Elevation(60.0);
+    renderer->GetActiveCamera()->Azimuth(30.0);
+    renderer->GetActiveCamera()->Zoom(1.3);
 
-  renderer->AddActor(actor);
-  renderer->AddActor2D(scalarBar);
-  renderer->SetBackground(1,1,0);
-  renderer->GetActiveCamera()->Elevation(60.0);
-  renderer->GetActiveCamera()->Azimuth(30.0);
-  renderer->GetActiveCamera()->Zoom(1.3);
+    vtkNew<vtkRenderWindow> renWin;
+    renWin->AddRenderer(renderer);
+    renWin->SetSize(300, 300);
+    renWin->Render();
 
-  renWin->SetSize(300,300);
-
-  renWin->Render();
-
-  SAVEIMAGE( renWin );
-
-  // interact with data
-  iren->Start();
-
-  // Clean up
-  renderer->Delete();
-  renWin->Delete();
-  iren->Delete();
-  sphere->Delete();
-  aTransform->Delete();
-  transFilter->Delete();
-  colorIt->Delete();
-  lut->Delete();
-  mapper->Delete();
-  actor->Delete();
+    // interact with data
+    vtkNew<vtkRenderWindowInteractor> iren;
+    iren->SetRenderWindow(renWin);
+    iren->Start();
 }
